@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ebe4d9">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap" rel="stylesheet">
+<title>RefMaster – Schiedsrichter-Helfer</title>
+<style>
+:root{
+  /* YourShowdown Markenfarben */
+  --bg:#ebe4d9; --surface:#ffffff; --surface2:#f5f0e8; --line:#d9cfbf;
+  --text:#223637; --muted:#6a7a7b; --accent:#ff6100; --accent-ink:#ffffff;
+  --accent-soft:rgba(255,97,0,.12); --accent-text:#d44f00;
+  --good:#1f8a4c; --bad:#c8341f; --gold:#c98a00;
+  --r:18px; --r-sm:12px;
+  --font:"Archivo","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light}
+body{background:var(--bg);color:var(--text);font:15px/1.45 var(--font);min-height:100dvh;
+  }
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hidden{display:none!important}
+
+/* layout */
+.app{max-width:760px;margin:0 auto;padding:0 16px calc(32px + env(safe-area-inset-bottom))}
+header.top{position:sticky;top:0;z-index:20;margin:0 -16px;padding:12px 16px;display:flex;align-items:center;gap:10px;
+  background:rgba(235,228,217,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{height:38px;width:auto;display:block;flex:none}
+.top h1{font-size:15px;font-weight:800;line-height:1.1;font-stretch:125%;text-transform:uppercase;letter-spacing:.02em}
+.top small{color:var(--muted);font-size:11px}
+.top .sp{flex:1}
+.iconbtn{height:36px;padding:0 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--muted)}
+.iconbtn:hover{color:var(--text)}
+.view{padding-top:20px;display:grid;gap:14px}
+.view>*{min-width:0}
+.row.wrap{flex-wrap:wrap}
+.h2{font-size:24px;font-weight:800;font-stretch:125%;text-transform:uppercase;letter-spacing:.005em;line-height:1.15}
+.sub{color:var(--muted);font-size:13px}
+.label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.hl{border-color:var(--accent)}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:1fr 1fr}
+.stack{display:grid;gap:10px}
+
+/* controls */
+.btn{min-height:46px;padding:0 16px;border-radius:var(--r-sm);font-weight:700;background:var(--surface2);border:1px solid var(--line);transition:transform .08s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn:hover{background:#ece5d8}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{background:#e65700}
+.btn.good{background:var(--text);border-color:var(--text);color:#fff}
+.btn.danger{background:transparent;border-color:rgba(200,52,31,.45);color:var(--bad)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px}
+.btn.block{width:100%}
+input[type=text],input[type=email],input[type=password],input[type=number],select{
+  width:100%;min-height:46px;padding:0 14px;border-radius:var(--r-sm);background:var(--surface2);border:1px solid var(--line);outline:0}
+input:focus,select:focus{border-color:var(--accent)}
+.field{display:grid;gap:6px}
+.seg{display:inline-flex;padding:3px;background:var(--surface2);border:1px solid var(--line);border-radius:12px}
+.seg{flex:none}
+.seg button{white-space:nowrap;padding:6px 12px;border-radius:9px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+
+/* menu tiles */
+.tile{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:16px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);transition:border-color .15s,transform .08s}
+.tile:hover{border-color:var(--text)}
+.tile:active{transform:scale(.99)}
+.tile .ic{width:46px;height:46px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;font-size:23px;flex:none}
+.tile.main{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.tile.main .ic{background:var(--accent-soft)}
+.tile b{display:block;font-size:15px}
+.tile span.d{color:var(--muted);font-size:12.5px}
+.tile .chev{margin-left:auto;color:var(--muted)}
+.pill{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--accent);color:#fff;margin-left:6px;vertical-align:2px}
+
+/* scores */
+.rank{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line)}
+.rank.first{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.badge{min-width:34px;height:34px;border-radius:11px;background:var(--surface2);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--muted);padding:0 6px}
+.first .badge{background:var(--accent);color:var(--accent-ink)}
+.rank .nm{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dl{font-weight:800;font-size:15px;color:var(--good);text-align:right;line-height:1}
+.dl small{display:block;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
+.big{font-size:26px;font-weight:900;font-stretch:125%;color:var(--accent);line-height:1;text-align:right}
+.big small{display:block;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chips button{min-height:44px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);font-weight:700;font-size:13px}
+.chips button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chips button.done::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-left:6px;vertical-align:middle}
+.chips button.on.done::after{background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line)}
+tr.clk{cursor:pointer}tr.clk:hover td{background:var(--surface2)}
+tr:last-child td{border-bottom:0}
+.tablewrap{overflow-x:auto;margin:-4px -6px}
+.pts{color:var(--accent-text);font-weight:700}
+.dim{color:var(--muted)}
+
+/* archery */
+.ring{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.ring button{aspect-ratio:1;border-radius:50%;font-weight:900;font-size:22px;border:3px solid;display:grid;place-items:center;transition:transform .08s}
+.ring button:active{transform:scale(.92)}
+.ring button{color:#fff}
+.r6{background:#223637;border-color:#223637}.r7{background:#3b5557;border-color:#223637}
+.r8{background:#e8472a;border-color:#a8321c}.r9{background:#ff6100;border-color:#c24a00}.r10{background:#ffc400;border-color:#c99700;color:#223637!important}
+.sel{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)!important}
+
+.agrid{display:grid;gap:10px;align-items:start}
+.acol{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 6px;display:grid;gap:6px;justify-items:center;min-width:0}
+.aname{font-weight:800;font-size:14px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-stretch:112%}
+.acol .big{text-align:center;font-size:30px}
+.aring{display:grid;gap:6px;width:100%;justify-items:center}
+.aring button{width:min(100%,50px);aspect-ratio:1;border-radius:50%;font-weight:900;font-size:21px;border:3px solid;color:#fff;display:grid;place-items:center;transition:transform .08s}
+.aring button:active{transform:scale(.9)}
+.btn.cb{width:100%;min-height:58px;padding:0 4px;font-size:22px;font-weight:900;display:grid;place-items:center;align-content:center;line-height:1.1}
+.btn.cb small{display:block;font-size:11px;font-weight:700;opacity:.85}
+.btn.cb.miss{background:var(--surface2);color:var(--muted)}
+.minus{display:flex;gap:6px;width:100%}.minus .btn{flex:1;padding:0}
+.acol input[type=number]{text-align:center;padding:0 6px}
+.pbtn{display:grid;gap:4px;justify-items:center;align-content:center;min-height:150px;padding:10px 4px;border-radius:var(--r);background:var(--surface2);border:2px dashed var(--line);text-align:center;min-width:0;transition:transform .08s}
+.pbtn:active{transform:scale(.97)}
+.pbtn .pn{font-weight:800;font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbtn .ph{color:var(--muted);font-size:13px}
+.pbtn .pr{font-size:44px;font-weight:900;font-stretch:125%;line-height:1}
+.pbtn .pp{font-weight:700;font-size:14px}
+.pbtn.p1{background:var(--accent);border:2px solid var(--accent);color:#fff}
+.pbtn.p2{background:var(--text);border:2px solid var(--text);color:#fff}
+.pbtn.p3{background:var(--surface);border:2px solid var(--line);color:var(--muted)}
+.stepval{font-size:56px;font-weight:900;font-stretch:125%;line-height:1;padding:4px 0;text-align:center}
+.rnd{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pips{display:flex;gap:4px;width:100%;justify-content:center}
+.pips i{flex:1;max-width:26px;aspect-ratio:1;border-radius:7px;border:1.5px dashed var(--line);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px}
+.pips i.hit{border:1.5px solid var(--text);background:var(--text);color:#fff}
+.pips i.miss{border:1.5px solid var(--line);background:var(--surface2);color:var(--muted)}
+.r0{background:var(--surface2);border-color:var(--line);color:var(--muted)!important;font-size:20px!important}
+.ins{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;justify-items:center}
+.ins .btn.cb{min-height:46px;font-size:17px;padding:0}
+.ins .btn.cb small{font-size:10px}
+.ins>:last-child:nth-child(odd){grid-column:span 2}
+.ins.one{grid-template-columns:1fr}
+.ins.one .btn.cb{width:100%}
+.ins.one .zero{margin-top:8px;min-height:40px}
+.rb{width:100%;max-width:46px;aspect-ratio:1;border-radius:50%;font-weight:900;font-size:18px;border:3px solid;color:#fff;display:grid;place-items:center;transition:transform .08s}
+.rb:active{transform:scale(.9)}
+.pips i.sum{flex:none;width:auto;min-width:40px;padding:0 10px;max-width:none;font-size:15px}
+.hround{display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 8px}
+.hcell{display:grid;gap:4px;justify-items:center;min-width:0}
+.hname{font-size:11px;font-weight:700;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hsum{font-weight:900;font-size:18px;font-stretch:125%;color:var(--accent-text)}
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(34,54,55,.6);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px}
+.modal{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;gap:14px}
+.modal h3{font-size:18px}
+.tip{background:var(--accent-soft);border:1px solid rgba(255,97,0,.35);color:var(--text);padding:10px 12px;border-radius:12px;font-size:13px}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--accent)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,140%);z-index:60;background:var(--text);color:#fff;border:1px solid var(--text);
+  padding:10px 16px;border-radius:99px;font-size:13px;font-weight:600;max-width:90vw;transition:transform .25s;box-shadow:0 10px 30px rgba(34,54,55,.3)}
+#toast.show{transform:translate(-50%,0)}
+
+/* auth */
+.auth{min-height:100dvh;display:grid;place-items:center;padding:20px}
+.auth .box{width:100%;max-width:400px;display:grid;gap:18px}
+.auth .logo{height:84px}
+.err{color:var(--bad);font-size:13px;min-height:18px}
+.notice{font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.link{color:var(--accent);font-weight:700}
+@media (min-width:600px){.cols3{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. Backend-Adapter
+   Alles, was Login & Speicherung betrifft, steckt hier. Für ein
+   echtes Backend (z. B. Supabase) nur diesen Block ersetzen:
+   Auth.signUp / signIn / signOut / restore und Store.load / save.
+   ============================================================ */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+
+const sha256 = async (s) => {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+};
+
+const Auth = {
+  USERS: "rm.users", SESSION: "rm.session",
+  async signUp(email, password) {
+    email = email.trim().toLowerCase();
+    const users = LS.get(this.USERS, {});
+    if (users[email]) throw new Error("Für diese E-Mail existiert bereits ein Konto.");
+    users[email] = { id: crypto.randomUUID(), hash: await sha256(email + ":" + password) };
+    LS.set(this.USERS, users);
+    return this._start(email, users[email].id);
+  },
+  async signIn(email, password) {
+    email = email.trim().toLowerCase();
+    const u = LS.get(this.USERS, {})[email];
+    if (!u || u.hash !== await sha256(email + ":" + password)) throw new Error("E-Mail oder Passwort falsch.");
+    return this._start(email, u.id);
+  },
+  _start(email, id) { const s = { email, id }; LS.set(this.SESSION, s); return s; },  // bleibt dauerhaft bestehen
+  restore() { return LS.get(this.SESSION, null); },
+  signOut() { LS.del(this.SESSION); },
+};
+
+const Store = {
+  key: (uid) => "rm.state." + uid,
+  load: (uid) => LS.get(Store.key(uid), null),
+  save: (uid, state) => LS.set(Store.key(uid), state),
+};
+
+/* ============================================================
+   2. Zustand & Spiellogik (rein, ohne DOM)
+   ============================================================ */
+const MAX_TEAMS = 3, GAMES = 10;
+// Stationen: Wuerfe pro Runde, moegliche Wurfwerte, Maximum pro Runde und Team
+const STATIONS = {
+  archery:  { title: "Bogenschießen", per: 3, vals: [10, 9, 8, 7, 6, 0], max: 30, unit: "Pfeil", steps: [1, 5, 10] },
+  cornhole: { title: "Cornhole",      per: 3, vals: [3, 1, 0],          max: 9,  unit: "Wurf", steps: [1, 3], perOptions: [3, 4],
+              names: { 3: "Loch", 1: "Brett", 0: "Fehl" } },
+  ladder:   { title: "Leitergolf",    per: 3, vals: [3, 2, 1, 0],       max: 9,  unit: "Wurf", steps: [1, 2, 3],
+              names: { 3: "Oben", 2: "Mitte", 1: "Unten", 0: "Fehl" } },
+};
+const fresh = () => ({
+  numTeams: 3,
+  teams: ["Team 1", "Team 2", "Team 3"],
+  ingame: [0, 0, 0],
+  stations: {           // Bogen, Cornhole, Leitergolf: gleiche Struktur
+    archery:  { mode: "throw", round: 1, rounds: {} },
+    cornhole: { mode: "throw", round: 1, rounds: {} },
+    ladder:   { mode: "throw", round: 1, rounds: {} },
+  },
+  weighing: { target: "", weights: ["", "", ""] },
+  games: {},            // { [n]: { first, second, third } } -> Team-Index oder null
+  activeGame: 1,
+});
+
+const Logic = {
+  teamIdx: (s) => [...Array(s.numTeams).keys()],
+  // Punkte eines Teams in Spiel g: Sieger g x 2, Zweiter g x 1, Dritter 0
+  gamePoints(s, g, t) {
+    const r = s.games[g];
+    return !r ? 0 : r.first === t ? g * 2 : r.second === t ? g : 0;
+  },
+  gameTotal(s, t) {
+    return Object.keys(s.games).reduce((sum, g) => sum + Logic.gamePoints(s, +g, t), 0);
+  },
+  lastGame: (s) => Math.max(0, ...Object.keys(s.games).map(Number)),   // letztes Spiel mit Ergebnis
+  ranking(s) {
+    return Logic.teamIdx(s).map(i => ({ i, name: s.teams[i], total: Logic.gameTotal(s, i) }))
+      .sort((a, b) => b.total - a.total);
+  },
+  entryScore: (e) => !e ? 0 : e.mode === "total" ? e.total : e.shots.reduce((a, b) => a + b, 0),
+  stationRound: (s, key, r, t) => Logic.entryScore(((s.stations[key].rounds[r] || [])[t])),
+  stationTotal(s, key, t) {
+    return Object.keys(s.stations[key].rounds).reduce((sum, r) => sum + Logic.stationRound(s, key, r, t), 0);
+  },
+  weighing(s) {
+    const target = parseFloat(s.weighing.target);
+    if (isNaN(target)) return null;
+    return Logic.teamIdx(s).map(i => {
+      const w = parseFloat(s.weighing.weights[i]);
+      const has = !isNaN(w);
+      return { i, name: s.teams[i], w, has, diff: has ? Math.abs(w - target) : Infinity };
+    }).sort((a, b) => a.diff - b.diff);
+  },
+};
+
+/* ============================================================
+   3. UI-Hilfen
+   ============================================================ */
+const esc = (v) => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const $ = (sel, el = document) => el.querySelector(sel);
+const fmt = (n) => Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, "");
+
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ============================================================
+   4. App
+   ============================================================ */
+const App = {
+  user: null, state: null, view: "menu", modal: null, tutStep: 0, authMode: "signin", authError: "",
+
+  async init() {
+    this.user = Auth.restore();
+    if (this.user) this.enter();
+    this.render();
+  },
+  enter() {
+    this.state = { ...fresh(), ...(Store.load(this.user.id) || {}) };
+    if (!this.state.stations) this.state.stations = fresh().stations;   // alte Spielstände
+    this.view = "menu";
+  },
+  save() { Store.save(this.user.id, this.state); },
+  go(view) { this.view = view; this.render(); scrollTo({ top: 0 }); },
+
+  /* ---------- Render-Wurzel ---------- */
+  render() {
+    const root = $("#root");
+    if (!this.user) { root.innerHTML = this.vAuth(); return; }
+    const body = {
+      menu: () => this.vMenu(), games: () => this.vGames(), ingame: () => this.vIngame(),
+      archery: () => this.vStation("archery"), cornhole: () => this.vStation("cornhole"), ladder: () => this.vStation("ladder"), weighing: () => this.vWeighing(),
+    }[this.view]();
+    root.innerHTML = `
+      <div class="app">
+        <header class="top">
+          ${this.view !== "menu" ? `<button class="iconbtn" data-act="go" data-v="menu" aria-label="Zurück">←</button>` : `<img class="logo" src="logo.svg" alt="Your Showdown">`}
+          <div><h1>RefMaster</h1><small>Schiedsrichter-Helfer</small></div>
+          <div class="sp"></div>
+          <button class="iconbtn" data-act="logout" title="${esc(this.user.email)}">Abmelden</button>
+        </header>
+        <main class="view">${body}</main>
+      </div>
+      ${this.modal ? this.vModal() : ""}`;
+  },
+
+  /* ---------- Views ---------- */
+  vAuth() {
+    const signup = this.authMode === "signup";
+    return `
+    <div class="auth"><form class="box" data-form="auth" autocomplete="on">
+      <div><img class="logo" src="logo.svg" alt="Your Showdown"></div>
+      <div><h1 class="h2">${signup ? "Konto erstellen" : "Willkommen zurück"}</h1>
+        <p class="sub">RefMaster – Spielpunkte, Stationen und Wertung für Schiedsrichter.</p></div>
+      <div class="field"><label class="label" for="em">E-Mail</label>
+        <input id="em" name="email" type="email" required autocomplete="email" inputmode="email"></div>
+      <div class="field"><label class="label" for="pw">Passwort</label>
+        <input id="pw" name="password" type="password" required minlength="6" autocomplete="${signup ? "new-password" : "current-password"}"></div>
+      <div class="err" role="alert">${esc(this.authError)}</div>
+      <button class="btn primary block" type="submit">${signup ? "Registrieren" : "Anmelden"}</button>
+      <p class="sub" style="text-align:center">${signup ? "Schon ein Konto?" : "Noch kein Konto?"}
+        <button type="button" class="link" data-act="authmode">${signup ? "Anmelden" : "Registrieren"}</button></p>
+      <p class="notice">Du bleibst angemeldet, bis du dich selbst abmeldest. Dies ist kein offizielles YourShowdown-Tool.
+        <br><b>Demo-Modus:</b> Konten und Spielstände liegen aktuell nur in diesem Browser.</p>
+    </form></div>`;
+  },
+
+  vMenu() {
+    const s = this.state;
+    const names = Logic.teamIdx(s).map(i => `
+      <div class="field"><label class="label" for="tn${i}">Team ${i + 1}</label>
+      <input id="tn${i}" type="text" maxlength="24" value="${esc(s.teams[i])}" data-team="${i}"></div>`).join("");
+    const tile = (v, ic, t, d, main) => `
+      <button class="tile ${main ? "main" : ""}" data-act="go" data-v="${v}">
+        <div class="ic">${ic}</div><div><b>${t}${main ? '<span class="pill">Hauptwertung</span>' : ""}</b><span class="d">${d}</span></div><span class="chev">›</span>
+      </button>`;
+    return `
+      <section class="card stack">
+        <div class="row between"><div><h2 style="font-size:16px">Team-Konfiguration</h2>
+          <p class="sub">Anzahl und Namen der Teams.</p></div>
+          <div class="seg" role="group" aria-label="Teamanzahl">
+            <button data-act="teams" data-n="2" class="${s.numTeams === 2 ? "on" : ""}">2 Teams</button>
+            <button data-act="teams" data-n="3" class="${s.numTeams === 3 ? "on" : ""}">3 Teams</button></div></div>
+        <div class="grid cols3">${names}</div>
+      </section>
+      <div class="label" style="margin-top:6px">Stationen</div>
+      ${tile("games", "🏆", "Spielpunkte &amp; Gesamtwertung", "Rangliste Spiele 1–10 mit Live-Stand", true)}
+      ${tile("ingame", "⚡", "In-Game Punkte", "Individuelle Punkte (1–5) schnell vergeben")}
+      ${tile("archery", "🎯", "Bogenschießen", "Pro Pfeil oder Gesamtpunkte je Runde")}
+      ${tile("cornhole", "🟠", "Cornhole", "Pro Wurf oder Gesamtpunkte je Runde")}
+      ${tile("ladder", "🪜", "Leitergolf", "Pro Wurf oder Gesamtpunkte je Runde")}
+      ${tile("weighing", "⚖️", "Wiegen &amp; Schätzen", "Zielgewicht und Abweichungen")}
+      <button class="tile" data-act="tutorial"><div class="ic">📖</div><div><b>Anleitung</b><span class="d">Schritt für Schritt erklärt</span></div><span class="chev">›</span></button>
+      <button class="btn danger block" data-act="confirm" data-kind="full">Session zurücksetzen</button>`;
+  },
+
+  vRanking() {
+    const s = this.state, lg = Logic.lastGame(s);
+    return Logic.ranking(s).map((r, k) => `
+      <div class="rank ${k === 0 && r.total > 0 ? "first" : ""}">
+        <div class="badge">${k + 1}</div><div class="nm">${esc(r.name)}</div>
+        ${lg ? `<div class="dl" title="Punkte in der letzten Runde">+${Logic.gamePoints(s, lg, r.i)}<small>Runde ${lg}</small></div>` : ""}
+        <div class="big">${r.total}<small>Punkte</small></div></div>`).join("");
+  },
+
+  vGames() {
+    const s = this.state, g = s.activeGame, r = s.games[g] || {};
+    const KEYS = ["first", "second", "third"], PTS = [g * 2, g, 0], LBL = ["Sieger", "Zweiter", "Dritter"];
+    const placeOf = (i) => KEYS.findIndex(k => r[k] === i);
+    const teamBtn = (i) => {
+      const k = placeOf(i);
+      return `<button class="pbtn ${k >= 0 ? "p" + (k + 1) : ""}" data-act="place" data-t="${i}" aria-pressed="${k >= 0}">
+        <span class="pn">${esc(s.teams[i])}</span>
+        ${k >= 0 ? `<span class="pr">${k + 1}.</span><span class="pp">${PTS[k] ? "+" + PTS[k] : "0"} Pkt</span>` : `<span class="ph">Tippen</span>`}
+      </button>`;
+    };
+    const rules = KEYS.slice(0, s.numTeams).map((_, k) => `${LBL[k]} <b>${PTS[k]}</b>`).join(" · ");
+    const next = KEYS.slice(0, s.numTeams).findIndex(k => r[k] == null);
+    return `
+      <div><h1 class="h2">Gesamtwertung</h1></div>
+      <div class="stack">${this.vRanking()}</div>
+      <div class="label" style="margin-bottom:-6px">Spiel</div>
+      <div class="chips" role="group" aria-label="Spiel wählen">
+        ${[...Array(Math.max(GAMES, g, Logic.lastGame(s)))].map((_, k) => `<button data-act="game" data-g="${k + 1}" class="${g === k + 1 ? "on" : ""} ${s.games[k + 1] ? "done" : ""}">${k + 1}</button>`).join("")}</div>
+      <section class="card stack">
+        <div class="row between"><div><div class="label">Runde ${g}${g <= GAMES ? ` von ${GAMES}` : " · Zusatzrunde"}</div>
+          <p class="sub" style="margin-top:2px">${rules} Pkt</p></div>
+          <button class="btn danger sm" data-act="clearGame">Zurücksetzen</button></div>
+        <p class="sub"><b>${next < 0 ? "Alle Plätze vergeben." : `Wer wurde ${LBL[next]}?`}</b> Team antippen. Nochmal tippen nimmt den Platz zurück.</p>
+        <div class="agrid" style="grid-template-columns:repeat(${s.numTeams},minmax(0,1fr))">${Logic.teamIdx(s).map(teamBtn).join("")}</div>
+        <button class="btn primary block" data-act="nextGame">${g >= GAMES ? "Runde abschließen →" : "Nächste Runde →"}</button>
+      </section>
+      <button class="btn block" data-act="showFinal">Endstand anzeigen</button>`;
+  },
+
+  /* Spalten-Layout: alle Teams nebeneinander, Eingaben darunter (alle gleichzeitig bedienbar) */
+  cols(inner) {
+    const s = this.state;
+    return `<div class="agrid" style="grid-template-columns:repeat(${s.numTeams},minmax(0,1fr))">${Logic.teamIdx(s).map(i => `
+      <section class="acol"><div class="aname">${esc(s.teams[i])}</div>${inner(i)}</section>`).join("")}</div>`;
+  },
+  score: (v, label = "Punkte") => `<div class="big">${v}<small>${label}</small></div>`,
+  btn: (cls, act, t, p, label) => `<button class="btn cb ${cls}" data-act="${act}" data-t="${t}" data-p="${p}">${label}</button>`,
+  minus(act, t, list) {
+    return `<div class="minus">${list.map(p => `<button class="btn sm" data-act="${act}" data-t="${t}" data-p="-${p}">−${p}</button>`).join("")}</div>`;
+  },
+
+  vIngame() {
+    const s = this.state;
+    return `
+      <div><h1 class="h2">In-Game Punkte</h1><p class="sub">Alle Teams gleichzeitig: Punkte direkt beim Team vergeben. Eigener Reset, die Hauptwertung bleibt unberührt.</p></div>
+      ${this.cols(i => this.score(s.ingame[i] || 0) +
+        [5, 4, 3, 2, 1].map(p => this.btn(p >= 3 ? "primary" : "", "ingame", i, p, "+" + p)).join("") +
+        this.minus("ingame", i, [1]))}
+      <button class="btn danger block" data-act="confirm" data-kind="ingame">In-Game Punkte zurücksetzen</button>`;
+  },
+
+  // Pips einer Runde (Wuerfe einzeln) oder Gesamtwert, im selben Stil fuer Live-Eingabe und Verlauf
+  pipsHtml(C, e, mode) {
+    if ((e && e.mode === "total") || (!e && mode === "total")) {
+      return `<div class="pips"><i class="sum ${e && e.total ? "hit" : ""}">${e ? e.total : 0}</i></div>`;
+    }
+    const shots = e ? e.shots : [];
+    return `<div class="pips">${[...Array(Math.max(C.per, shots.length))].map((_, k) =>
+      `<i class="${k < shots.length ? (shots[k] === 0 ? "miss" : "hit") : ""}">${k < shots.length ? shots[k] : ""}</i>`).join("")}</div>`;
+  },
+
+  vStation(key) {
+    const s = this.state, C = this.cfg(key), st = s.stations[key], r = st.round;
+    const entry = (rr, t) => (st.rounds[rr] || [])[t];
+    const cols = `style="grid-template-columns:repeat(${s.numTeams},minmax(0,1fr))"`;
+    const hasData = (e) => e && (e.mode === "total" ? e.total > 0 : e.shots.length > 0);
+
+    const live = (i) => {
+      const e = entry(r, i), shots = e && e.mode === "throw" ? e.shots : [];
+      let input;
+      if (st.mode === "throw") {
+        input = `<div class="ins${key === "ladder" ? " one" : ""}">` + (key === "archery"
+          ? C.vals.map(p => `<button class="rb r${p}" data-act="shot" data-k="${key}" data-t="${i}" data-p="${p}" aria-label="${p ? p + " Punkte" : "Fehltreffer"}">${p === 0 ? "✕" : p}</button>`).join("")
+          : C.vals.map(p => `<button class="btn cb ${p === C.vals[0] ? "good" : p === 0 ? "miss zero" : p === C.vals[1] ? "primary" : ""}" data-act="shot" data-k="${key}" data-t="${i}" data-p="${p}">${p === 0 ? "0" : "+" + p}<small>${C.names[p]}</small></button>`).join(""))
+          + `</div>`;
+        const n = shots.length;
+        input += `<button class="btn sm block" data-act="undo" data-k="${key}" data-t="${i}" ${n ? "" : "disabled style='opacity:.4'"}>↩ ${n ? (shots[n - 1] === 0 ? "Fehl" : "−" + shots[n - 1]) : "–"}</button>`;
+      } else {
+        input = `<div class="ins">${C.steps.map(n => `
+          <button class="btn cb" data-act="step" data-k="${key}" data-t="${i}" data-p="-${n}">−${n}</button>
+          <button class="btn cb primary" data-act="step" data-k="${key}" data-t="${i}" data-p="${n}">+${n}</button>`).join("")}</div>`;
+      }
+      return `<section class="acol">
+        <div class="aname">${esc(s.teams[i])}</div>
+        ${this.score(Logic.stationTotal(s, key, i), "Gesamt")}
+        ${this.pipsHtml(C, e, st.mode)}
+        ${input}
+      </section>`;
+    };
+
+    // Verlauf: abgeschlossene Runden, neueste zuerst, im selben Stil wie die Live-Eingabe
+    const past = Object.keys(st.rounds).map(Number).filter(k => k !== r && (st.rounds[k] || []).some(hasData)).sort((x, y) => y - x);
+    const hist = past.map(k => `
+      <div class="hround">
+        <div class="row between"><b class="rnd" style="font-size:12px">Runde ${k}</b>
+          <button class="btn sm" data-act="sround" data-k="${key}" data-r="${k}">Bearbeiten</button></div>
+        <div class="agrid" ${cols}>${Logic.teamIdx(s).map(i => `
+          <div class="hcell"><div class="hname">${esc(s.teams[i])}</div>${this.pipsHtml(C, entry(k, i), st.mode)}
+            <div class="hsum">${Logic.stationRound(s, key, k, i)}</div></div>`).join("")}</div>
+      </div>`).join("");
+
+    return `
+      <div class="row between wrap" style="align-items:flex-end">
+        <div><h1 class="h2" style="font-size:20px">${C.title}</h1><p class="rnd" style="font-size:12px">Runde ${r} · ${st.mode === "throw" ? `${C.per} ${C.unit}e, max. ${C.max}` : `Gesamt 0–${C.max}`}</p></div>
+        <div class="seg" role="group" aria-label="Eingabe">
+          <button data-act="mode" data-k="${key}" data-m="throw" class="${st.mode === "throw" ? "on" : ""}">Pro ${C.unit}</button>
+          <button data-act="mode" data-k="${key}" data-m="total" class="${st.mode === "total" ? "on" : ""}">Gesamt</button></div>
+      </div>
+      ${C.perOptions ? `<div class="seg" role="group" aria-label="Würfe pro Runde" style="justify-self:start">${C.perOptions.map(n =>
+        `<button data-act="per" data-k="${key}" data-n="${n}" class="${C.per === n ? "on" : ""}">${n} ${C.unit === "Wurf" ? "Würfe" : C.unit + "e"}</button>`).join("")}</div>` : ""}
+      <div class="agrid" ${cols}>${Logic.teamIdx(s).map(live).join("")}</div>
+      <button class="btn primary block" data-act="snext" data-k="${key}">Nächste Runde →</button>
+      ${past.length ? `<div class="label">Bisherige Runden</div>${hist}` : ""}
+      ${r > 1 || past.length ? `<button class="btn block" data-act="sround" data-k="${key}" data-r="${Math.max(r, ...Object.keys(st.rounds).map(Number))}" ${r === Math.max(r, ...Object.keys(st.rounds).map(Number)) ? "style='display:none'" : ""}>Zur aktuellen Runde</button>` : ""}
+      <button class="btn danger block" data-act="confirm" data-kind="${key}">${C.title} zurücksetzen</button>`;
+  },
+
+  vWeighing() {
+    const s = this.state;
+    return `
+      <div><h1 class="h2">Wiegen &amp; Schätzen</h1><p class="sub">Wer am nächsten am Zielgewicht liegt, gewinnt.</p></div>
+      <section class="card field"><label class="label" for="wt">Zielgewicht</label>
+        <input id="wt" type="number" inputmode="decimal" step="any" value="${esc(s.weighing.target)}" data-weigh="target" placeholder="z. B. 12.5"></section>
+      ${this.cols(i => `<input id="w${i}" type="number" inputmode="decimal" step="any" aria-label="Gewicht ${esc(s.teams[i])}" placeholder="Gewicht" value="${esc(s.weighing.weights[i] ?? "")}" data-weigh="${i}">`)}
+      <div id="wres" class="stack">${this.vWeighResults()}</div>
+      <button class="btn danger block" data-act="confirm" data-kind="weighing">Wiegen zurücksetzen</button>`;
+  },
+  vWeighResults() {
+    const res = Logic.weighing(this.state);
+    if (!res) return `<p class="sub">Zielgewicht eingeben, um die Rangliste zu sehen.</p>`;
+    return res.map((r, k) => `
+      <div class="rank ${k === 0 && r.has ? "first" : ""}">
+        <div class="badge">${k + 1}</div>
+        <div class="nm">${esc(r.name)}<div class="sub" style="font-weight:400">${r.has ? `Gemessen ${fmt(r.w)} · Abweichung <b class="pts">${fmt(r.diff)}</b>` : "Kein Wert eingetragen"}</div></div>
+        ${k === 0 && r.has ? "👑" : ""}</div>`).join("");
+  },
+
+  /* ---------- Modals ---------- */
+  CONFIRMS: {
+    full: ["Session zurücksetzen?", "Alle Punkte, Würfe, Gewichte und Namen werden unwiderruflich gelöscht.", "Ja, alles zurücksetzen"],
+    ingame: ["In-Game Punkte zurücksetzen?", "Nur die In-Game Punkte gehen auf 0. Alles andere bleibt.", "Ja, zurücksetzen"],
+    archery: ["Bogenschießen zurücksetzen?", "Alle Runden und Punkte werden gelöscht.", "Ja, zurücksetzen"],
+    cornhole: ["Cornhole zurücksetzen?", "Alle Runden und Punkte werden gelöscht.", "Ja, zurücksetzen"],
+    ladder: ["Leitergolf zurücksetzen?", "Alle Runden und Punkte werden gelöscht.", "Ja, zurücksetzen"],
+    weighing: ["Wiegen zurücksetzen?", "Zielgewicht und Messwerte werden gelöscht.", "Ja, zurücksetzen"],
+  },
+  TUTORIAL: [
+    ["Team-Konfiguration", "Im Hauptmenü wählst du 2 oder 3 Teams und passt die Namen an.", "Namen am besten vor Spielbeginn festlegen."],
+    ["Spielpunkte & Gesamtwertung", "Wähle Spiel 1–10 und vergib Platz 1–3. Die Punkte verdoppeln sich pro Spiel (Spiel 10 = 20 Pkt für Platz 1). Oben siehst du die Live-Rangliste.", "Vertippt? Wähle das Spiel erneut oder setze die Runde zurück."],
+    ["In-Game Punkte", "Schnell-Tool für spontane Entscheidungen: 1–5 Punkte direkt vergeben, mit eigenem Reset.", "Die Hauptwertung bleibt unberührt."],
+    ["Bogenschießen, Cornhole & Leitergolf", "Bogenschießen (3 Pfeile: 0, 6–10), Cornhole (3 oder 4 Würfe einstellbar: 0, +1, +3) und Leitergolf (3 Würfe: 0–3) laufen in Runden. Oben stellst du pro Spiel um: jeden Wurf einzeln oder die Gesamtpunkte pro Runde eintragen.", "Fehler lassen sich per Rückgängig bzw. Minus-Tasten korrigieren."],
+    ["Wiegen & Schätzen", "Zielgewicht und gewogene Werte eintragen. Die Abweichung wird berechnet und die Rangliste sortiert.", "Am nächsten dran gewinnt."],
+    ["Dein Konto", "Du bleibst angemeldet, bis du dich abmeldest. Deine Spielstände werden pro Konto gespeichert.", "Inoffizielles Tool, nicht von YourShowdown."],
+  ],
+  vModal() {
+    const m = this.modal;
+    if (m.type === "confirm") {
+      const [t, d, ok] = this.CONFIRMS[m.kind];
+      return `<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true">
+        <h3>${t}</h3><p class="sub">${d}</p>
+        <div class="grid g2"><button class="btn" data-act="closeModal">Abbrechen</button>
+        <button class="btn primary" data-act="doReset" data-kind="${m.kind}">${ok}</button></div></div></div>`;
+    }
+    if (m.type === "finish") {
+      return `<div class="overlay"><div class="modal" role="dialog" aria-modal="true">
+        <h3>Seid ihr fertig?</h3><p class="sub">Runde ${this.state.activeGame} ist abgeschlossen. Ist das Spiel damit beendet, oder wird weitergespielt?</p>
+        <div class="grid g2"><button class="btn" data-act="continueGame">Nein, weiter</button>
+        <button class="btn primary" data-act="showFinal">Ja, fertig</button></div></div></div>`;
+    }
+    if (m.type === "final") {
+      const s = this.state, rk = Logic.ranking(s), tie = rk.length > 1 && rk[0].total === rk[1].total;
+      const medal = ["🥇", "🥈", "🥉"];
+      return `<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true">
+        <div class="label">Endstand nach Runde ${s.activeGame}</div>
+        <h3>${tie ? "Gleichstand an der Spitze!" : `${esc(rk[0].name)} gewinnt!`}</h3>
+        <div class="stack">${rk.map((r, k) => `
+          <div class="rank ${r.total === rk[0].total ? "first" : ""}"><div class="badge">${medal[k] || k + 1}</div>
+          <div class="nm">${esc(r.name)}</div><div class="big">${r.total}<small>Punkte</small></div></div>`).join("")}</div>
+        <div class="grid ${s.activeGame >= GAMES ? "g2" : ""}">${s.activeGame >= GAMES ? `<button class="btn" data-act="continueGame">Doch weiterspielen</button>` : ""}
+        <button class="btn primary" data-act="closeModal">Schließen</button></div></div></div>`;
+    }
+    const [t, d, tip] = this.TUTORIAL[this.tutStep], last = this.tutStep === this.TUTORIAL.length - 1;
+    return `<div class="overlay"><div class="modal" role="dialog" aria-modal="true">
+      <div class="label">Schritt ${this.tutStep + 1} von ${this.TUTORIAL.length}</div>
+      <h3>${esc(t)}</h3><p>${esc(d)}</p><div class="tip">💡 ${esc(tip)}</div>
+      <div class="dots">${this.TUTORIAL.map((_, k) => `<i class="${k === this.tutStep ? "on" : ""}"></i>`).join("")}</div>
+      <div class="grid g2"><button class="btn" data-act="tutPrev" ${this.tutStep === 0 ? "disabled style='opacity:.4'" : ""}>Zurück</button>
+      <button class="btn primary" data-act="tutNext">${last ? "Fertig" : "Weiter"}</button></div></div></div>`;
+  },
+
+  // Stations-Konfiguration inkl. eingestellter Wuerfe pro Runde; Maximum = Wuerfe x hoechster Wurfwert
+  cfg(key) {
+    const base = STATIONS[key], per = this.state.stations[key].per || base.per;
+    return { ...base, per, max: per * Math.max(...base.vals) };
+  },
+
+  // Eintrag (Runde x Team) holen; bei anderem Eingabemodus als gespeichert neu beginnen
+  entry(st, t, mode) {
+    const row = st.rounds[st.round] = st.rounds[st.round] || [];
+    for (let i = 0; i < MAX_TEAMS; i++) row[i] = row[i] || { mode, shots: [], total: 0 };
+    if (row[t].mode !== mode) row[t] = { mode, shots: [], total: 0 };
+    return row[t];
+  },
+
+  /* ---------- Aktionen ---------- */
+  actions: {
+    go: (a, d) => a.go(d.v),
+    authmode: (a) => { a.authMode = a.authMode === "signin" ? "signup" : "signin"; a.authError = ""; a.render(); },
+    logout: (a) => { Auth.signOut(); a.user = a.state = null; a.render(); },
+    teams(a, d) {
+      const s = a.state; s.numTeams = +d.n; a.save(); a.render(); toast(`${s.numTeams} Teams aktiv`);
+    },
+    game: (a, d) => { a.state.activeGame = +d.g; a.save(); if (a.view !== "games") a.view = "games"; a.render(); },
+    place(a, d) {
+      const st = a.state, g = st.activeGame, t = +d.t;
+      const r = st.games[g] = st.games[g] || { first: null, second: null, third: null };
+      const keys = ["first", "second", "third"].slice(0, st.numTeams);
+      const cur = keys.find(k => r[k] === t);
+      if (cur) r[cur] = null;
+      else {
+        const free = keys.find(k => r[k] == null);
+        if (!free) return toast("Alle Plätze sind schon vergeben");
+        r[free] = t;
+      }
+      if (keys.every(k => r[k] == null)) delete st.games[g];
+      a.save(); a.render();
+    },
+    nextGame(a) {
+      const st = a.state;
+      if (st.activeGame >= GAMES) { a.modal = { type: "finish" }; return a.render(); }   // ab Runde 10: nach jeder Runde fragen
+      st.activeGame++; a.save(); a.render();
+    },
+    continueGame(a) { a.state.activeGame++; a.modal = null; a.save(); a.render(); },
+    showFinal(a) { a.modal = { type: "final" }; a.render(); },
+    clearGame(a) { delete a.state.games[a.state.activeGame]; a.save(); a.render(); toast(`Spiel ${a.state.activeGame} zurückgesetzt`); },
+    ingame(a, d) {
+      const s = a.state, t = +d.t, p = +d.p;
+      s.ingame[t] = Math.max(0, (s.ingame[t] || 0) + p); a.save(); a.render();
+      toast(`${s.teams[t]}: ${p > 0 ? "+" : ""}${p}`);
+    },
+    per: (a, d) => { a.state.stations[d.k].per = +d.n; a.save(); a.render(); },
+    mode: (a, d) => { a.state.stations[d.k].mode = d.m; a.save(); a.render(); },
+    sround: (a, d) => { a.state.stations[d.k].round = +d.r; a.save(); a.render(); },
+    snext(a, d) { const st = a.state.stations[d.k]; st.round++; a.save(); a.render(); toast(`Runde ${st.round}`); },
+    shot(a, d) {
+      const C = a.cfg(d.k), st = a.state.stations[d.k], t = +d.t, p = +d.p;
+      const e = a.entry(st, t, "throw");
+      if (e.shots.length >= C.per) return toast(`Runde voll (${C.per} ${C.unit}e). Weiter mit "Nächste Runde".`);
+      e.shots.push(p); a.save(); a.render(); toast(`${a.state.teams[t]}: ${p}`);
+    },
+    undo(a, d) {
+      const e = a.entry(a.state.stations[d.k], +d.t, "throw");
+      if (!e.shots.length) return toast("Nichts rückgängig zu machen");
+      const p = e.shots.pop(); a.save(); a.render(); toast(`${a.state.teams[+d.t]}: ${p} entfernt`);
+    },
+    step(a, d) {
+      const C = a.cfg(d.k), e = a.entry(a.state.stations[d.k], +d.t, "total");
+      e.total = Math.min(C.max, Math.max(0, e.total + +d.p)); a.save(); a.render();
+    },
+    confirm: (a, d) => { a.modal = { type: "confirm", kind: d.kind }; a.render(); },
+    closeModal(a, d, e) { if (e.target.closest(".modal") && e.target.dataset.act !== "closeModal") return; a.modal = null; a.render(); },
+    doReset(a, d) {
+      const s = a.state, f = fresh(), k = d.kind;
+      if (k === "full") a.state = f;
+      else if (k === "ingame") s.ingame = f.ingame;
+      else if (STATIONS[k]) s.stations[k] = f.stations[k];
+      else if (k === "weighing") s.weighing = f.weighing;
+      a.modal = null; a.save(); a.render(); toast("Zurückgesetzt");
+    },
+    tutorial: (a) => { a.tutStep = 0; a.modal = { type: "tutorial" }; a.render(); },
+    tutPrev(a) { if (a.tutStep > 0) a.tutStep--; a.render(); },
+    tutNext(a) {
+      if (a.tutStep < a.TUTORIAL.length - 1) a.tutStep++; else { a.modal = null; toast("Anleitung abgeschlossen"); }
+      a.render();
+    },
+  },
+};
+
+/* ============================================================
+   5. Events (Delegation)
+   ============================================================ */
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const fn = App.actions[el.dataset.act];
+  if (fn) fn(App, el.dataset, e);
+});
+
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset.team !== undefined) {
+    const v = t.value.trim();
+    if (v) { App.state.teams[+t.dataset.team] = v; App.save(); toast("Name gespeichert"); }
+    App.render();
+  }
+});
+
+document.addEventListener("input", (e) => {
+  const k = e.target.dataset.weigh;
+  if (k === undefined) return;
+  const w = App.state.weighing;
+  if (k === "target") w.target = e.target.value; else w.weights[+k] = e.target.value;
+  App.save();
+  $("#wres").innerHTML = App.vWeighResults();   // nur Ergebnisse neu zeichnen, damit der Fokus bleibt
+});
+
+document.addEventListener("submit", async (e) => {
+  if (e.target.dataset.form !== "auth") return;
+  e.preventDefault();
+  const f = new FormData(e.target);
+  try {
+    App.user = App.authMode === "signup"
+      ? await Auth.signUp(f.get("email"), f.get("password"))
+      : await Auth.signIn(f.get("email"), f.get("password"));
+    App.authError = ""; App.enter();
+  } catch (err) { App.authError = err.message; }
+  App.render();
+});
+
+App.init();
+</script>
+</body>
+</html>
