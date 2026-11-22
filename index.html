@@ -113,11 +113,11 @@ tr:last-child td{border-bottom:0}
 .ring button:active{transform:scale(.92)}
 .ring button{color:#fff}
 /* Farben wie auf der Scheibe: 10 gelb, 9 orange-gelb, 8 hellblau, 7 dunkelblau, 6 weiß */
-.r6{background:#fff;border-color:#4f7fb3;color:#2f4b73!important}
-.r7{background:#3a6194;border-color:#2f4b73;color:#fff!important}
-.r8{background:#a9c6ea;border-color:#7fa3d0;color:#2f4b73!important}
-.r9{background:#f2a93b;border-color:#d98f1c;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.25)}
-.r10{background:#f7e94a;border-color:#d4c524;color:#2f4b73!important}
+.r6{background:#fff;border-color:#2f6db0;color:#1f4f8a!important}
+.r7{background:#2f5e99;border-color:#1f4678;color:#fff!important}
+.r8{background:#6fa3e0;border-color:#3f7bc4;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.r9{background:#f59a0c;border-color:#c97a00;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.r10{background:#ffe600;border-color:#d1b800;color:#1f4f8a!important}
 .sel{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)!important}
 
 .agrid{display:grid;gap:10px;align-items:start}
@@ -370,6 +370,7 @@ const App = {
         <div class="ic">${ic}</div><div><b>${t}${main ? '<span class="pill">Hauptwertung</span>' : ""}</b><span class="d">${d}</span></div><span class="chev">›</span>
       </button>`;
     return `
+      <button class="tile" data-act="tutorial"><div class="ic">📖</div><div><b>Anleitung</b><span class="d">Schritt für Schritt erklärt</span></div><span class="chev">›</span></button>
       <section class="card stack">
         <div class="row between"><div><h2 style="font-size:16px">Team-Konfiguration</h2>
           <p class="sub">Anzahl und Namen der Teams.</p></div>
@@ -385,7 +386,6 @@ const App = {
       ${tile("cornhole", "🟠", "Cornhole", "Pro Wurf oder Gesamtpunkte je Runde")}
       ${tile("ladder", "🪜", "Leitergolf", "Pro Wurf oder Gesamtpunkte je Runde")}
       ${tile("weighing", "⚖️", "Wiegen &amp; Schätzen", "Zielgewicht und Abweichungen")}
-      <button class="tile" data-act="tutorial"><div class="ic">📖</div><div><b>Anleitung</b><span class="d">Schritt für Schritt erklärt</span></div><span class="chev">›</span></button>
       <button class="btn danger block" data-act="confirm" data-kind="full">Session zurücksetzen</button>`;
   },
 
